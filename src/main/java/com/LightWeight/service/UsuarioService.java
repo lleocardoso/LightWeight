@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+    //Camada de orquestração de negócios do Usuário.
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -21,7 +22,7 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+    @Transactional // Garante atomicidade: se ocorrer erro no salvamento, sofre rollback automático no banco.
     public UsuarioResponseDTO create(UsuarioRequestDTO dto){
         if (usuarioRepository.existsByEmail(dto.getEmail())){
             throw new ConflitoDeDadosException("E-mail já cadastrado" + dto.getEmail());
@@ -69,6 +70,7 @@ public class UsuarioService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com id: " + id));
     }
 
+    //Isola a entidade convertendo-a em representação DTO de saída
     private UsuarioResponseDTO toDto(Usuario u) {
         return new UsuarioResponseDTO(u.getId(), u.getNome(), u.getIdade(), u.getEmail());
     }

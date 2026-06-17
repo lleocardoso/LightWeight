@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
 
+    //Objeto de saída estruturado para exibir dados públicos do usuário.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+    //Ponto de entrada HTTP REST da aplicação para recursos de Treino.
+    //Responsável estritamente pelo protocolo de transporte, validação de payloads e direcionamento semântico HTTP.
 @RestController
 @RequestMapping("/treinos")
 @RequiredArgsConstructor
@@ -29,10 +31,9 @@ public class TreinoController {
     @PostMapping("/usuario/{usuarioId}")
     public ResponseEntity<TreinoResponseDTO> create(
             @PathVariable UUID usuarioId,
-            @RequestBody @Valid TreinoRequestDTO dto) {
-
+            @RequestBody @Valid TreinoRequestDTO dto) {// @Valid garante o acionamento do validador de contratos
         TreinoResponseDTO response = treinoService.create(usuarioId, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);// Retorna 201.
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -50,9 +51,10 @@ public class TreinoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         treinoService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build(); // Retorna Status 204
     }
 
+    // Aciona a regra de negócio matemática de atualização de tonelagem.
     @PutMapping("/{id}/calcular-volume")
     public ResponseEntity<BigDecimal> calcularVolume(@PathVariable UUID id) {
         BigDecimal volumeTotal = treinoService.calcularVolumeTotal(id);

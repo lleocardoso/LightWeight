@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+    //Entidade que representa a tabela 'usuarios' no banco de dados
 @Data
 @EqualsAndHashCode(exclude = {"treinos"})
 @ToString(exclude = {"treinos"})
@@ -30,6 +31,7 @@ public class Usuario {
     @Column(nullable = false)
     private String senha;
 
+    //Relacionamento 1 . n: se o usuário for deletado, todos os seus treinos associados também serão (CascadeType.ALL)
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Treino> treinos = new ArrayList<>();
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+    //Objeto que encapsula e valida os dados de entrada para criação ou edição de usuários, assim evitando a exposição direta da entidade do banco na API externa.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

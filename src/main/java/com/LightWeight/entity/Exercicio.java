@@ -9,6 +9,7 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+    //Entidade que mapeia os detalhes físicos de cada exercício executado dentro de um treino.
 @Data
 @EqualsAndHashCode(exclude = "treino")
 @ToString(exclude = "treino")

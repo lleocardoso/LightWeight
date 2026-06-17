@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+    //Objeto de saída estruturado para exibir dados públicos do treino.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+    //service que processa a lógica de inserção e listagem de exercícios físicos
 @Service
 @RequiredArgsConstructor
 public class ExercicioService {
@@ -22,7 +23,7 @@ public class ExercicioService {
     private final TreinoRepository treinoRepository;
 
     @Transactional
-    public ExercicioResponseDTO create(UUID treinoId, ExercicioRequestDTO dto) {
+    public ExercicioResponseDTO create(UUID treinoId, ExercicioRequestDTO dto) { // Assegura que o exercício só pode ser criado se o treino "pai" existir.
         Treino treino = treinoRepository.findById(treinoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Treino não encontrado com o id: " + treinoId));
 

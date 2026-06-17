@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+    //Projection utilizada para exibir o relatório final de um treino após sua conclusão, focando no somatório do volume total de carga movimentada.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

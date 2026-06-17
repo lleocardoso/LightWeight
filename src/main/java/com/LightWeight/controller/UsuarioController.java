@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+    //Expõe as rotas para cadastro, edição, listagem e deleção de contas.
 @RestController
 @RequestMapping("/usuarios")
 @RequiredArgsConstructor

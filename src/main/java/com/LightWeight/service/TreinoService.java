@@ -28,10 +28,8 @@ public class TreinoService {
 
         Usuario usuario = usuarioService.findEntityById(usuarioId);
 
-        if (treinoRepository.existsByUsuarioIdAndEstado(
-                usuarioId,
-                TreinoEstado.ATIVO)) {
-
+        // Regra de Negócio: Impede a coexistência de dois treinos rodando simultaneamente em aberto.
+        if (treinoRepository.existsByUsuarioIdAndEstado(usuarioId, TreinoEstado.ATIVO)) {
             throw new ConflitoDeDadosException(
                     "O usuário já possui um treino ativo.");
         }
@@ -88,6 +86,7 @@ public class TreinoService {
                 .toList();
     }
 
+    //Calcula o volume de toneladas deslocadas: Somatório de (Carga * Séries * Repetições) por exercício.
     @Transactional
     public BigDecimal calcularVolumeTotal(UUID treinoId) {
         Treino treino = findEntityById(treinoId);

@@ -9,15 +9,20 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
+    //Interceptador global de erros da API.
+    //Captura qualquer exceção lançada na camada de serviço ou controle, centralizando a resposta em um formato limpo e padronizado (ErroResponse) com o código HTTP adequado.
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Trata falhas de buscas que não retornaram resultados (404).
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<ErroResponse> handleRecursoNaoEncontrado(
             RecursoNaoEncontradoException ex, HttpServletRequest request) {
         return build(HttpStatus.NOT_FOUND, "Não Encontrado", ex.getMessage(), request.getRequestURI());
     }
 
+    // Trata tentativas de cadastros duplicados ou conflitos lógicos (409).
     @ExceptionHandler(ConflitoDeDadosException.class)
     public ResponseEntity<ErroResponse> handleConflitodeDados(
             ConflitoDeDadosException ex, HttpServletRequest request) {
@@ -37,6 +42,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNPROCESSABLE_ENTITY, "Entidade Não Processável", ex.getMessage(), request.getRequestURI());
     }
 
+    // Captura falhas de validação de dados enviadas pelo cliente no Bean Validation (400).
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErroResponse> handleValidation(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -55,6 +61,7 @@ public class GlobalExceptionHandler {
                 "O método " + ex.getMethod() + " não é suportado para esta rota.", request.getRequestURI());
     }
 
+    // Fallback para qualquer outro erro não mapeado no sistema (500).
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ErroResponse> handleGeneric (
                 Exception ex, HttpServletRequest request){

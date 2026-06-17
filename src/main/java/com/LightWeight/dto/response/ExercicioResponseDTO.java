@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+    //Objeto de saída estruturado para exibir dados públicos do exercicio.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

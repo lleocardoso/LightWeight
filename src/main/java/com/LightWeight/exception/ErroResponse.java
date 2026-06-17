@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+    //Corpo padrão da resposta de erro da API.
 @Data
 @AllArgsConstructor
 public class ErroResponse {

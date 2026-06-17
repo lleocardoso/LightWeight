@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+    //Validador de entrada de dados biomecânicos e de volume de treino; Impede que o usuário insira valores irreais (ex: cargas negativas ou séries absurdas).
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
