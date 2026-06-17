@@ -1,0 +1,944 @@
+﻿
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\LightWeightApplication.java ===
+package com.LightWeight;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class LightWeightApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LightWeightApplication.class, args);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\config\SecurityConfig.java ===
+package com.LightWeight.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\controller\ExercicioController.java ===
+package com.LightWeight.controller;
+
+import com.LightWeight.dto.request.ExercicioRequestDTO;
+import com.LightWeight.dto.response.ExercicioResponseDTO;
+import com.LightWeight.service.ExercicioService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/exercicios")
+@RequiredArgsConstructor
+public class ExercicioController {
+
+    private final ExercicioService exercicioService;
+
+    // Rota para listar todos os exercÃ­cios cadastrados
+    @GetMapping
+    public ResponseEntity<List<ExercicioResponseDTO>> findAll() {
+        return ResponseEntity.ok(exercicioService.findAll());
+    }
+
+    // Rota para cadastrar um exercÃ­cio dentro de um treino especÃ­fico
+    @PostMapping("/treino/{treinoId}")
+    public ResponseEntity<ExercicioResponseDTO> create(
+            @PathVariable UUID treinoId,
+            @RequestBody @Valid ExercicioRequestDTO dto) {
+        ExercicioResponseDTO response = exercicioService.create(treinoId, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\controller\TreinoController.java ===
+package com.LightWeight.controller;
+
+import com.LightWeight.dto.request.TreinoRequestDTO;
+import com.LightWeight.dto.response.TreinoResponseDTO;
+import com.LightWeight.service.TreinoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/treinos")
+@RequiredArgsConstructor
+public class TreinoController {
+
+    private final TreinoService treinoService;
+
+    @GetMapping
+    public ResponseEntity<List<TreinoResponseDTO>> findAll() {
+        List<TreinoResponseDTO> responses = treinoService.findAll();
+        return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping("/usuario/{usuarioId}")
+    public ResponseEntity<TreinoResponseDTO> create(
+            @PathVariable UUID usuarioId,
+            @RequestBody @Valid TreinoRequestDTO dto) {
+
+        TreinoResponseDTO response = treinoService.create(usuarioId, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<TreinoResponseDTO>> findAllByUsuario(@PathVariable UUID usuarioId) {
+        List<TreinoResponseDTO> responses = treinoService.findAllByUsuario(usuarioId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TreinoResponseDTO> findById(@PathVariable UUID id) {
+        TreinoResponseDTO response = treinoService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        treinoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/calcular-volume")
+    public ResponseEntity<BigDecimal> calcularVolume(@PathVariable UUID id) {
+        BigDecimal volumeTotal = treinoService.calcularVolumeTotal(id);
+        return ResponseEntity.ok(volumeTotal);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\controller\UsuarioController.java ===
+package com.LightWeight.controller;
+
+import com.LightWeight.dto.request.UsuarioRequestDTO;
+import com.LightWeight.dto.response.UsuarioResponseDTO;
+import com.LightWeight.service.UsuarioService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/usuarios")
+@RequiredArgsConstructor
+public class UsuarioController {
+
+    private final UsuarioService usuarioService;
+
+    @PostMapping
+    public ResponseEntity<UsuarioResponseDTO> create(@RequestBody @Valid UsuarioRequestDTO dto) {
+        UsuarioResponseDTO response = usuarioService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDTO>> findAll() {
+        List<UsuarioResponseDTO> responses = usuarioService.findAll();
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable UUID id) {
+        UsuarioResponseDTO response = usuarioService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable UUID id, @RequestBody @Valid UsuarioRequestDTO dto) {
+        UsuarioResponseDTO response = usuarioService.update(id, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        usuarioService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\request\ExercicioRequestDTO.java ===
+package com.LightWeight.dto.request;
+
+import com.LightWeight.enums.AgrupamentoMuscular;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExercicioRequestDTO {
+    @NotBlank(message = "Nome Ã© obrigatÃ³rio")
+    @Size(max = 100, message = "Nome deve ter no mÃ¡ximo 100 caracteres")
+    private String nome;
+
+    @NotNull(message = "SÃ©ries Ã© obrigatÃ³rio")
+    @Min(value = 1, message = "sÃ©ries Ã© obrigatÃ³rio")
+    @Max(value = 20, message = "SÃ©ries deve ser no mÃ¡ximo 20")
+    private Integer series;
+
+    @NotNull(message = "RepetiÃ§Ãµes Ã© obrigatÃ³rio")
+    @Min(value = 1, message = "RepetiÃ§Ãµes deve ser no mÃ­nimo 1")
+    @Max(value = 100, message = "RepetiÃ§Ãµes deve ser no mÃ¡ximo 100")
+    private Integer repeticoes;
+
+    @NotNull(message = "Carga Ã© obrigatÃ³ria")
+    @DecimalMin(value = "0.01", message = "Carga deve ser maior que zero")
+    @DecimalMax(value = "500.0", message = "Carga deve ser no mÃ¡ximo 500kg")
+    private BigDecimal carga;
+
+    @NotNull(message = "Agrupamento muscular Ã© obrigatÃ³rio")
+    private AgrupamentoMuscular agrupamentoMuscular;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\request\TreinoRequestDTO.java ===
+package com.LightWeight.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TreinoRequestDTO {
+
+    private boolean peito = false;
+    private boolean costas = false;
+    private boolean quadriceps = false;
+    private boolean posterior = false;
+
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\request\UsuarioRequestDTO.java ===
+package com.LightWeight.dto.request;
+
+import com.LightWeight.enums.AgrupamentoMuscular;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UsuarioRequestDTO {
+
+    @NotBlank(message = "Nome Ã© obrigatÃ³rio")
+    @Size(max = 150, message = "Nome deve ter no mÃ¡ximo 150 caracteres")
+    private String nome;
+
+    @NotNull(message = "Idade Ã© obrigatÃ³ria")
+    @Min(value = 1, message = "Idade deve ser no mÃ­nimo 1")
+    @Max(value = 100, message = "Idade deve ser no mÃ¡ximo 100")
+    private Integer idade;
+
+    @NotBlank(message = "E-mail deve ser obrigatÃ³rio" )
+    @Email(message = "E-mail deve ter formÃ¡to vÃ¡lido")
+    private String email;
+
+    @NotBlank(message = "Senha Ã© obrigatÃ³ria")
+    @Size(min = 8, message = "Senha deve ter no mÃ­nimo 8 caracteres")
+    private String senha;
+
+
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\response\ExercicioResponseDTO.java ===
+package com.LightWeight.dto.response;
+
+import com.LightWeight.enums.AgrupamentoMuscular;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExercicioResponseDTO {
+    private UUID id;
+    private UUID treinoId;
+    private String nome;
+    private Integer series;
+    private Integer repeticoes;
+    private BigDecimal carga;
+    private AgrupamentoMuscular agrupamento;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\response\TreinoFinalizadoResponseDTO.java ===
+package com.LightWeight.dto.response;
+
+import com.LightWeight.dto.request.ExercicioRequestDTO;
+import com.LightWeight.enums.AgrupamentoMuscular;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TreinoFinalizadoResponseDTO {
+    private UUID id;
+    private LocalDateTime DataHoraInicio;
+    private LocalDateTime DataHoraFim;
+    private BigDecimal volumeTotal;
+    private List<AgrupamentoMuscular> agrupamentosTrabalhados;
+    private List <ExercicioRequestDTO> exercicios;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\response\TreinoResponseDTO.java ===
+package com.LightWeight.dto.response;
+
+import com.LightWeight.dto.request.ExercicioRequestDTO;
+import com.LightWeight.enums.TreinoEstado;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TreinoResponseDTO {
+    private UUID id;
+    private UUID usuarioId;
+    private TreinoEstado estado;
+    private boolean peito;
+    private boolean costas;
+    private boolean quadriceps;
+    private boolean superior;
+    private LocalDateTime dataHoraInicio;
+    private LocalDateTime dataHoraFim;
+    private List<ExercicioRequestDTO> exercicios;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\dto\response\UsuarioResponseDTO.java ===
+package com.LightWeight.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.UUID;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UsuarioResponseDTO {
+    private UUID id;
+    private String nome;
+    private Integer idade;
+    private String email;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\entity\Exercicio.java ===
+package com.LightWeight.entity;
+
+import com.LightWeight.enums.AgrupamentoMuscular;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Data
+@EqualsAndHashCode(exclude = "treino")
+@ToString(exclude = "treino")
+@Entity
+@Table(name = "exercicios")
+
+public class Exercicio {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "treino_id", nullable = false)
+    private Treino treino;
+
+    @Column(nullable = false, length = 100)
+    private String nome;
+
+    @Column(nullable = false)
+    private Integer series;
+
+    @Column(nullable = false)
+    private Integer repeticoes;
+
+    @Column
+    private BigDecimal carga;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "agrupamentomuscular", nullable = false, length = 20)
+    private AgrupamentoMuscular agrupamentoMuscular;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\entity\Treino.java ===
+package com.LightWeight.entity;
+
+import com.LightWeight.enums.AgrupamentoMuscular;
+import com.LightWeight.enums.TreinoEstado;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@EqualsAndHashCode(exclude = {"usuario", "exercicios", "agrupamentosTrabalhados"})
+@ToString(exclude = {"usuario", "exercicios", "agrupamentosTrabalhados"})
+@Entity
+@Table(name = "treinos")
+public class Treino {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TreinoEstado estado = TreinoEstado.INATIVO;
+
+    private LocalDateTime dataHoraInicio;
+    private LocalDateTime dataHoraFim;
+
+    @Column
+    private BigDecimal volumeTotal;
+
+    @OneToMany(mappedBy = "treino", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Exercicio> exercicios = new ArrayList<>();
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\entity\Usuario.java ===
+package com.LightWeight.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@EqualsAndHashCode(exclude = {"treinos"})
+@ToString(exclude = {"treinos"})
+@Entity
+@Table(name = "usuarios")
+public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, length = 150)
+    private String nome;
+
+    @Column(nullable = false)
+    private Integer idade;
+
+    @Column(nullable = false, unique = true, length = 254)
+    private String email;
+
+    @Column(nullable = false)
+    private String senha;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Treino> treinos = new ArrayList<>();
+
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\enums\AgrupamentoMuscular.java ===
+package com.LightWeight.enums;
+
+public enum AgrupamentoMuscular {
+    PEITO,
+    COSTAS,
+    QUADRICEPS,
+    POSTERIOR,
+    BICEPS,
+    TRICEPS,
+    OMBRO,
+    ABDOMEN,
+    PANTURRILHA
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\enums\TreinoEstado.java ===
+package com.LightWeight.enums;
+
+public enum TreinoEstado {
+    INATIVO,
+    ATIVO,
+    CONCLUIDO
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\exception\ConflitoDeDadosException.java ===
+package com.LightWeight.exception;
+
+public class ConflitoDeDadosException extends RuntimeException {
+    public ConflitoDeDadosException(String mensagem) {
+        super(mensagem);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\exception\EntidadeNaoProcessavelException.java ===
+package com.LightWeight.exception;
+
+public class EntidadeNaoProcessavelException extends RuntimeException {
+    public EntidadeNaoProcessavelException(String mensagem) {
+        super(mensagem);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\exception\ErroResponse.java ===
+package com.LightWeight.exception;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+public class ErroResponse {
+    private LocalDateTime timestamp;
+    private int status;
+    private String erro;
+    private String message;
+    private String caminho;
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\exception\EstadoInvalidoException.java ===
+package com.LightWeight.exception;
+
+public class EstadoInvalidoException extends RuntimeException {
+    public EstadoInvalidoException(String mensagem) {
+        super(mensagem);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\exception\GlobalExceptionHandler.java ===
+package com.LightWeight.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<ErroResponse> handleRecursoNaoEncontrado(
+            RecursoNaoEncontradoException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, "NÃ£o Encontrado", ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(ConflitoDeDadosException.class)
+    public ResponseEntity<ErroResponse> handleConflitodeDados(
+            ConflitoDeDadosException ex, HttpServletRequest request) {
+        return build (HttpStatus.CONFLICT, "Conflito", ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(EstadoInvalidoException.class)
+    public ResponseEntity<ErroResponse> handleEstadoInvalido(
+            EstadoInvalidoException ex, HttpServletRequest request){
+        return build(HttpStatus.CONFLICT, "Estado Invalido", ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(EntidadeNaoProcessavelException.class)
+    public ResponseEntity<ErroResponse> handleEntidadeNaoProcessavel(
+            EntidadeNaoProcessavelException ex, HttpServletRequest request) {
+            ex.printStackTrace();
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, "Entidade NÃ£o ProcessÃ¡vel", ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErroResponse> handleValidation(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String mensagem = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(f -> f.getField() + ": " + f.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, "ValidaÃ§Ã£o", mensagem, request.getRequestURI());
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErroResponse> handleMethodNotSupported(
+            org.springframework.web.HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        return build(HttpStatus.METHOD_NOT_ALLOWED, "MÃ©todo NÃ£o Permitido",
+                "O mÃ©todo " + ex.getMethod() + " nÃ£o Ã© suportado para esta rota.", request.getRequestURI());
+    }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErroResponse> handleGeneric (
+                Exception ex, HttpServletRequest request){
+            ex.printStackTrace();
+            return build(HttpStatus.INTERNAL_SERVER_ERROR, "Erro Interno", "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
+                    request.getRequestURI());
+        }
+
+        private ResponseEntity<ErroResponse> build (HttpStatus status, String erro, String mensagem, String caminho){
+            ErroResponse body = new ErroResponse(LocalDateTime.now(), status.value(), erro, mensagem, caminho);
+            return ResponseEntity.status(status).body(body);
+        }
+
+    }
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\exception\RecursoNaoEncontradoException.java ===
+package com.LightWeight.exception;
+
+public class RecursoNaoEncontradoException extends RuntimeException {
+    public RecursoNaoEncontradoException(String message) {
+        super(message);
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\repository\ExercicioRepository.java ===
+package com.LightWeight.repository;
+
+import java.util.UUID;
+import com.LightWeight.entity.Exercicio;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface ExercicioRepository extends JpaRepository<Exercicio, UUID> {
+    List<Exercicio> findByTreinoId(UUID treinoId);
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\repository\TreinoRepository.java ===
+package com.LightWeight.repository;
+
+import com.LightWeight.entity.Treino;
+import com.LightWeight.enums.TreinoEstado;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.UUID;
+import java.util.List;
+
+@Repository
+public interface TreinoRepository extends JpaRepository<Treino,UUID> {
+    List <Treino> findAllByUsuarioId(UUID usuarioId);
+
+    boolean existsByUsuarioIdAndEstado(UUID usuarioId, TreinoEstado estado);
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\repository\UsuarioRepository.java ===
+package com.LightWeight.repository;
+
+import com.LightWeight.entity.Usuario;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.UUID;
+import java.util.Optional;
+
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
+
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndIdNot(String email, UUID id);
+
+    Optional<Usuario> findByEmail(String email);
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\service\ExercicioService.java ===
+package com.LightWeight.service;
+
+import com.LightWeight.dto.request.ExercicioRequestDTO;
+import com.LightWeight.dto.response.ExercicioResponseDTO;
+import com.LightWeight.entity.Exercicio;
+import com.LightWeight.entity.Treino;
+import com.LightWeight.exception.RecursoNaoEncontradoException;
+import com.LightWeight.repository.ExercicioRepository;
+import com.LightWeight.repository.TreinoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ExercicioService {
+
+    private final ExercicioRepository exercicioRepository;
+    private final TreinoRepository treinoRepository;
+
+    @Transactional
+    public ExercicioResponseDTO create(UUID treinoId, ExercicioRequestDTO dto) {
+        Treino treino = treinoRepository.findById(treinoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Treino nÃ£o encontrado com o id: " + treinoId));
+
+        Exercicio exercicio = new Exercicio();
+        exercicio.setTreino(treino);
+        exercicio.setNome(dto.getNome());
+        exercicio.setSeries(dto.getSeries());
+        exercicio.setRepeticoes(dto.getRepeticoes());
+        exercicio.setCarga(dto.getCarga());
+        exercicio.setAgrupamentoMuscular(dto.getAgrupamentoMuscular());
+
+        exercicio = exercicioRepository.save(exercicio);
+        return toDto(exercicio);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExercicioResponseDTO> findAll() {
+        return exercicioRepository.findAll().stream().map(this::toDto).toList();
+    }
+
+    private ExercicioResponseDTO toDto(Exercicio exercicio) {
+        ExercicioResponseDTO dto = new ExercicioResponseDTO();
+        dto.setId(exercicio.getId());
+        dto.setTreinoId(exercicio.getTreino().getId());
+        dto.setNome(exercicio.getNome());
+        dto.setSeries(exercicio.getSeries());
+        dto.setRepeticoes(exercicio.getRepeticoes());
+        dto.setCarga(exercicio.getCarga());
+        dto.setAgrupamento(exercicio.getAgrupamentoMuscular());
+        return dto;
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\service\TreinoService.java ===
+package com.LightWeight.service;
+
+import com.LightWeight.dto.request.TreinoRequestDTO;
+import com.LightWeight.dto.response.TreinoResponseDTO;
+import com.LightWeight.entity.Treino;
+import com.LightWeight.entity.Usuario;
+import com.LightWeight.enums.TreinoEstado;
+import com.LightWeight.exception.ConflitoDeDadosException;
+import com.LightWeight.exception.RecursoNaoEncontradoException;
+import com.LightWeight.repository.TreinoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class TreinoService {
+
+    private final TreinoRepository treinoRepository;
+    private final UsuarioService usuarioService;
+
+    @Transactional
+    public TreinoResponseDTO create(UUID usuarioId, TreinoRequestDTO dto) {
+
+        Usuario usuario = usuarioService.findEntityById(usuarioId);
+
+        if (treinoRepository.existsByUsuarioIdAndEstado(
+                usuarioId,
+                TreinoEstado.ATIVO)) {
+
+            throw new ConflitoDeDadosException(
+                    "O usuÃ¡rio jÃ¡ possui um treino ativo.");
+        }
+
+        Treino treino = new Treino();
+        treino.setUsuario(usuario);
+        treino.setEstado(TreinoEstado.INATIVO);
+
+        treino = treinoRepository.save(treino);
+
+        return toDto(treino);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TreinoResponseDTO> findAllByUsuario(UUID usuarioId) {
+
+        usuarioService.findEntityById(usuarioId);
+
+        return treinoRepository.findAllByUsuarioId(usuarioId)
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public TreinoResponseDTO findById(UUID id) {
+        return toDto(findEntityById(id));
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        treinoRepository.delete(findEntityById(id));
+    }
+
+    private Treino findEntityById(UUID id) {
+        return treinoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException(
+                                "Treino nÃ£o encontrado com o id: " + id));
+    }
+
+    private TreinoResponseDTO toDto(Treino treino) {
+        TreinoResponseDTO dto = new TreinoResponseDTO();
+        dto.setId(treino.getId());
+        dto.setUsuarioId(treino.getUsuario().getId());
+        dto.setEstado(treino.getEstado());
+        return dto;
+    }
+
+    @Transactional(readOnly = true)
+    public List<TreinoResponseDTO> findAll() {
+        return treinoRepository.findAll().stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public BigDecimal calcularVolumeTotal(UUID treinoId) {
+        Treino treino = findEntityById(treinoId);
+
+        BigDecimal volume = treino.getExercicios().stream()
+                .map(e -> e.getCarga()
+                        .multiply(BigDecimal.valueOf(e.getSeries()))
+                        .multiply(BigDecimal.valueOf(e.getRepeticoes())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        treino.setVolumeTotal(volume);
+        treinoRepository.save(treino);
+
+        return volume;
+    }
+}
+
+=== FILE: C:\Users\LLEOCARD\Desktop\LightWeight\src\main\java\com\LightWeight\service\UsuarioService.java ===
+package com.LightWeight.service;
+
+import com.LightWeight.exception.RecursoNaoEncontradoException;
+import com.LightWeight.dto.request.UsuarioRequestDTO;
+import com.LightWeight.dto.response.UsuarioResponseDTO;
+import com.LightWeight.entity.Usuario;
+import com.LightWeight.exception.ConflitoDeDadosException;
+import com.LightWeight.repository.UsuarioRepository;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class UsuarioService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UsuarioResponseDTO create(UsuarioRequestDTO dto){
+        if (usuarioRepository.existsByEmail(dto.getEmail())){
+            throw new ConflitoDeDadosException("E-mail jÃ¡ cadastrado" + dto.getEmail());
+        }
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.getNome());
+        usuario.setIdade(dto.getIdade());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        return toDto(usuarioRepository.save(usuario));
+    }
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO findById(UUID id){
+        return toDto(findEntityById(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> findAll() {
+        return usuarioRepository.findAll().stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public UsuarioResponseDTO update(UUID id, UsuarioRequestDTO dto){
+        Usuario usuario = findEntityById(id);
+        if (usuarioRepository.existsByEmailAndIdNot(dto.getEmail(), id)){
+            throw new ConflitoDeDadosException("E-mail jÃ¡ cadastrado: " + dto.getEmail());
+        }
+        usuario.setNome(dto.getNome());
+        usuario.setIdade(dto.getIdade());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        return toDto(usuarioRepository.save(usuario));
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        findEntityById(id);
+        usuarioRepository.deleteById(id);
+    }
+
+    public Usuario findEntityById(UUID id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("UsuÃ¡rio nÃ£o encontrado com id: " + id));
+    }
+
+    private UsuarioResponseDTO toDto(Usuario u) {
+        return new UsuarioResponseDTO(u.getId(), u.getNome(), u.getIdade(), u.getEmail());
+    }
+}
