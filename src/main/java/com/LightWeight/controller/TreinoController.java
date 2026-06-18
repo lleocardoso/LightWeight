@@ -60,4 +60,11 @@ public class TreinoController {
         BigDecimal volumeTotal = treinoService.calcularVolumeTotal(id);
         return ResponseEntity.ok(volumeTotal);
     }
+
+    //Implementação da rota de ativação de treino.
+    @PutMapping("/{id}/ativar")
+    public ResponseEntity<TreinoResponseDTO> ativar(@PathVariable UUID id) {
+        TreinoResponseDTO response = treinoService.ativarTreino(id);
+        return ResponseEntity.ok(response);
+    }
 }

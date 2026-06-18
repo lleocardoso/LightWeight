@@ -102,4 +102,16 @@ public class TreinoService {
 
         return volume;
     }
+
+    //Validação de limite de treinos ativos
+    @Transactional
+    public TreinoResponseDTO ativarTreino(UUID id) {
+        Treino treino = findEntityById(id);
+        if (treinoRepository.existsByUsuarioIdAndEstado(treino.getUsuario().getId(), TreinoEstado.ATIVO)) {
+            throw new ConflitoDeDadosException("O usuário já possui um treino ativo no momento.");
+        }
+
+        treino.setEstado(TreinoEstado.ATIVO);
+        return toDto(treinoRepository.save(treino));
+    }
 }
